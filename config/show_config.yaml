@@ -1,0 +1,10 @@
+# config/show_config.yaml
+
+show:
+  duration: 10.0         # durata dello show in secondi
+  formation: "circle"    # tipo di formazione: circle, line, grid
+  formation_radius: 3.0  # raggio se formazione circolare
+  formation_rows: 2      # righe se griglia
+  formation_cols: 2      # colonne se griglia
+  formation_spacing: 1.0 # distanza tra droni in griglia
+  min_distance: 0.5      # distanza minima tra droni per evitare collisioni
