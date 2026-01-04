@@ -1,17 +1,49 @@
+
 # config/drone_config.yaml
 
-drones:
-  - drone_id: 0
-    initial_position: [0, 0, 0]
-    max_velocity: 2.0
-    max_acceleration: 1.0
+# === Modalità di definizione dei droni ===
+# 1) "explicit": usa la lista 'drones' qui sotto
+# 2) "auto": genera automaticamente N droni con pattern iniziale (grid/circle)
+mode: "auto"   # "explicit" | "auto"
 
+# === Default globali (usati in auto-mode e come fallback in explicit-mode) ===
+defaults:
+  v_max: 2.0            # [m/s]
+  a_max: 2.5            # [m/s^2]
+  start_z: 0.0          # [m] altitudine iniziale
+  start_pattern: "grid" # "grid" | "circle" (usato SOLO in auto-mode)
+  start_spacing: 0.6    # [m] distanza tra punti in auto-mode
+  num_drones: 6         # usato SOLO in auto-mode
+
+# === Definizione esplicita dei droni (usata SOLO se mode == "explicit") ===
+# Nota: se un campo manca, verrà preso dai 'defaults'
+drones:
   - drone_id: 1
-    initial_position: [2, 0, 0]
+    initial_position: [0.0, 0.0, 0.0]
     max_velocity: 2.0
-    max_acceleration: 1.0
+    max_acceleration: 2.5
 
   - drone_id: 2
-    initial_position: [-2, 0, 0]
+    initial_position: [0.6, 0.0, 0.0]
     max_velocity: 2.0
-    max_acceleration: 1.0
+    max_acceleration: 2.5
+
+  - drone_id: 3
+    initial_position: [0.0, 0.6, 0.0]
+    max_velocity: 2.0
+    max_acceleration: 2.5
+
+  - drone_id: 4
+    initial_position: [0.6, 0.6, 0.0]
+    max_velocity: 2.0
+    max_acceleration: 2.5
+
+  - drone_id: 5
+    initial_position: [1.2, 0.0, 0.0]
+    max_velocity: 2.0
+    max_acceleration: 2.5
+
+  - drone_id: 6
+    initial_position: [1.2, 0.6, 0.0]
+    max_velocity: 2.0
+    max_acceleration: 2.5
