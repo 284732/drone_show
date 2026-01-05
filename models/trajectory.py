@@ -15,7 +15,7 @@ class Trajectory:
     """
 
     # costruttore
-    def __init__(self, duration, position_function):
+    def __init__(self, duration, position_function, start_time=0.0):
         """
         :param duration: durata totale [s]
         :param position_function: callable f(t) -> np.ndarray shape (3,)
@@ -25,24 +25,33 @@ class Trajectory:
         """
         self.duration = float(duration)     # durata totale della traiettoria in secondi
         self._position_function = position_function     # una callable che, dato un tempo t(float), ritorna un vettore 3d np.ndarray di shape (3,)
+        self.start_time = start_time
 
         if self.duration <= 0:
             raise ValueError("Trajectory duration must be positive")
 
     def position(self, t):
         """
-        Valuta la traiettoria al tempo t.
-        Se t è fuori intervallo, viene saturato.
-
-        Implicazione importante del clamping: fuori dalla finestra temporale, la posizione rimane
-        "ferma" all'estremo (inizio o fine). Questo è comodo per simulazioni/visualizzazioni robuste,
-        ma se in futuro si preferisce alzare un'eccezione fuori range, puoi aggiungere un flag.
+        Valuta la traiettoria al tempo globale t.
+        Tiene conto di start_time.
         """
-        t_clamped = np.clip(t, 0.0, self.duration)      # se t fuori da [0, duration], viene saturato con np.clip: t<0 -> t=0.0 oppure t>duration -> t=duration
-        pos = np.asarray(self._position_function(t_clamped), dtype=float)       # converte il risultato in np.ndarray(float)
+
+        # 1. Prima della partenza → fermo all'inizio
+        if t < self.start_time:
+            local_t = 0.0
+
+        # 2. Dopo la fine → fermo alla fine
+        elif t > self.start_time + self.duration:
+            local_t = self.duration
+
+        # 3. Durante la traiettoria
+        else:
+            local_t = t - self.start_time
+
+        pos = np.asarray(self._position_function(local_t), dtype=float)
 
         if pos.shape != (3,):
-            raise ValueError("Position function must return a 3D vector")       # validazione del vettore
+            raise ValueError("Position function must return a 3D vector")
 
         return pos
 

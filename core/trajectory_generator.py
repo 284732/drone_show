@@ -18,7 +18,7 @@ def generate_trajectories(drones, assignment, duration):
         p0 = drone.initial_position
         pf = assignment[drone_id]
 
-        traj_func = minimum_jerk_3d(p0, pf, duration)
-        trajectories[drone_id] = Trajectory(duration, traj_func)
+        traj_func = minimum_jerk_3d(p0, pf, duration)   # costruisce la funzione f(t) tale che f(0) = p0 e f(duration) = pf e andamento "smooth"
+        trajectories[drone_id] = Trajectory(duration, traj_func)    # creo l'istanza (l'oggetto) Trajectory
 
-    return trajectories
+    return trajectories     # ritorno il dizionario creato
