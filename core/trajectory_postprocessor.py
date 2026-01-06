@@ -1,16 +1,15 @@
-
-# core/trajectory_postprocessor.py
 import numpy as np
 
 from core.trajectory_generator import generate_trajectories
 from core.trajectory_validator import (
     validate_trajectory,
+    validate_swarm_trajectories,
     check_constraints_and_collisions,
-    summarize_swarm_violations,
+    #summarize_swarm_violations,
 )
 
 
-def time_scale_trajectories(drones, assignment, duration, max_iterations=10, dt_check=0.01, eps=1e-6):
+def time_scale_trajectories(drones, assignment, duration, max_iterations=3, dt_check=0.01, eps=1e-6):
     """
     Rigenera le traiettorie aumentando la durata se violano velocità o accelerazione massima.
     Miglioria: scala la durata con il fattore PEGGIORE (massimo tra tutti i droni) ad ogni iterazione,
@@ -26,7 +25,7 @@ def time_scale_trajectories(drones, assignment, duration, max_iterations=10, dt_
         global_scale = 1.0
         for drone in drones:
             res = validate_trajectory(trajectories[drone.drone_id], drone, dt=dt_check, eps=eps)
-            if res["max_speed"] > (drone.max_velocity + eps):
+            if res["max_speed"] > (drone.max_velocity + eps):   # se la velocità massima misurata supera il limite, calcola il fattore per azzerare la violazione
                 scale_v = res["max_speed"] / drone.max_velocity
                 global_scale = max(global_scale, scale_v)
             if res["max_acceleration"] > (drone.max_acceleration + eps):
@@ -43,6 +42,99 @@ def time_scale_trajectories(drones, assignment, duration, max_iterations=10, dt_
     return trajectories, current_duration
 
 
+import numpy as np
+from core.trajectory_validator import validate_swarm_trajectories
+
+
+###OLD
+def resolve_collisions_with_start_delays(
+    trajectories,
+    drones,
+    *,
+    min_distance=0.5,
+    dt=0.01,
+    delay_step=4,
+    max_iters=10,
+):
+    """
+    Risolve collisioni introducendo ritardi di partenza sui droni coinvolti.
+
+    Strategia:
+      - se esiste almeno una collisione allo stesso tempo t,
+        ritarda uno dei droni coinvolti
+      - ripete fino a risoluzione o max_iters
+
+    Modifica SOLO traj.start_time.
+    """
+    # inizializza tutti i ritardi a zero
+    start_delays = {did: 0.0 for did in trajectories.keys()}
+    for traj in trajectories.values():
+        traj.start_time = 0.0
+
+    for it in range(max_iters):
+        violations = validate_swarm_trajectories(
+            trajectories, drones, min_distance=min_distance, dt=dt
+        )
+
+        # nessuna collisione → OK
+        if not violations:
+            return trajectories, {
+                "status": "OK",
+                "iterations": it,
+                "start_delays": start_delays,
+            }
+
+        # prendi la prima collisione trovata
+        did1, did2, t_collision = violations[0]
+
+        # strategia semplice: ritarda il secondo drone
+        start_delays[did2] += delay_step
+        trajectories[did2].start_time = start_delays[did2]
+
+    # se esce dal loop → non risolto
+    return trajectories, {
+        "status": "UNRESOLVED_COLLISION",
+        "iterations": max_iters,
+        "start_delays": start_delays,
+    }
+
+
+def resolve_collisions_with_start_delays_me(
+    trajectories, drones, *, min_distance=0.5, dt=0.05,
+    delay_step=5, max_iters=5, max_total_delay=8.0
+):
+    # Non azzerare: mantieni eventuali start_time esistenti
+    start_delays = {did: getattr(traj, "start_time", 0.0)
+                    for did, traj in trajectories.items()}
+
+    for it in range(max_iters):
+        violations = validate_swarm_trajectories(
+            trajectories, drones, min_distance=min_distance, dt=dt
+        )
+        if not violations:
+            return trajectories, {"status": "OK", "iterations": it, "start_delays": start_delays}
+
+        # collisione più precoce
+        did1, did2, t_collision = min(violations, key=lambda v: v[2])
+
+        # ritarda quello con meno delay accumulato
+        new_delay = start_delays[did2] + delay_step
+
+        # cap ai ritardi totali
+        if new_delay > max_total_delay:
+            return trajectories, {"status": "UNRESOLVED_COLLISION_MAX_DELAY",
+                                  "iterations": it+1, "start_delays": start_delays}
+
+        start_delays[did2] = new_delay
+        trajectories[did2].start_time = new_delay
+
+    return trajectories, {"status": "UNRESOLVED_COLLISION",
+                          "iterations": max_iters, "start_delays": start_delays}
+
+
+
+################################################
+# Applica ritardi per salita in cascata
 def apply_start_delays(trajectories, delay_step=0.5):
     """
     Applica un ritardo progressivo ai droni (ordinati per drone_id).
@@ -56,6 +148,10 @@ def apply_start_delays(trajectories, delay_step=0.5):
 def apply_altitude_layers(assignment, layer_height=0.3):
     """
     Applica separazione verticale ai target per ridurre collisioni.
+
+    In pratica prende l'assegnazione "assignment" (mappa drone_id -> target_position) e sposta in alto
+    il target del drone in base al suo indice, creando "layer" di quota (Z) distanziati di "layer_heigh".
+    Cambia il target finale !!!! da non usare
     """
     new_assignment = {}
     for i, drone_id in enumerate(sorted(assignment.keys())):
@@ -69,6 +165,7 @@ def _apply_target_z_offsets_for_offenders(assignment, offenders, layer_height):
     """
     Aggiunge offset verticale SOLO ai droni offensori (lista di drone_id).
     Alterna +h / -h per ridurre sovrapposizioni.
+    Cambia il target finale !!!! da non usare
     """
     new_assignment = dict(assignment)
     sign = +1.0
@@ -80,7 +177,7 @@ def _apply_target_z_offsets_for_offenders(assignment, offenders, layer_height):
     return new_assignment
 
 
-def auto_process_trajectories(
+'''def auto_process_trajectories(
     drones,
     assignment,
     base_duration,
@@ -212,4 +309,7 @@ def auto_process_trajectories(
         report["warning"] = "Collisioni non risolvibili con le strategie configurate."
         report["final_check"] = check
 
-    return trajectories, duration, status, report
+    return trajectories, duration, status, report'''
+
+
+

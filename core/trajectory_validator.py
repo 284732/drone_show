@@ -1,5 +1,3 @@
-
-# core/trajectory_validator.py
 import numpy as np
 
 
@@ -10,14 +8,14 @@ def validate_trajectory(traj, drone, dt=0.01, eps=1e-9):
     """
     # Campionamento locale sulla durata della traiettoria (tempo interno, gestito da Trajectory.position)
     t_samples = np.arange(0, traj.duration + dt, dt)
-    positions = np.array([traj.position(t) for t in t_samples])
+    positions = np.array([traj.position(t) for t in t_samples]) # valuta la posizione della traiettoria a ciascun tempo -> ottieni una matrice di dimensione (N,d) dove d è la dimensione spaziale (3D)
 
     # Velocità (derivata prima discretizzata)
-    velocities = np.diff(positions, axis=0) / dt
-    speed = np.linalg.norm(velocities, axis=1)
+    velocities = np.diff(positions, axis=0) / dt    # calcola pos[i+1] - pos[]i
+    speed = np.linalg.norm(velocities, axis=1)  # calcola la norma Euclidea ad ogni passo
     max_speed = np.max(speed) if len(speed) > 0 else 0.0
 
-    # Accelerazione (derivata seconda discretizzata)
+    # Accelerazione (derivata seconda discretizzata)    # stesso concetto ma applicato alla velocità
     accelerations = np.diff(velocities, axis=0) / dt
     accel = np.linalg.norm(accelerations, axis=1)
     max_accel = np.max(accel) if len(accel) > 0 else 0.0
@@ -40,19 +38,19 @@ def validate_swarm_trajectories(trajectories, drones, min_distance=0.5, dt=0.01)
     Considera l'orizzonte temporale GLOBALE (start_time + duration) per ciascun drone.
     Ritorna lista di violazioni [(drone_id1, drone_id2, t), ...].
     """
-    drone_ids = list(trajectories.keys())
+    drone_ids = list(trajectories.keys())   # estrai ID dei droni dello sciame
     violations = []
 
     # Tempo globale di fine (considera ritardi)
     T_end = max(trajectories[did].start_time + trajectories[did].duration for did in drone_ids)
-    t_samples = np.arange(0, T_end + dt, dt)
+    t_samples = np.arange(0, T_end + dt, dt)    # crea campioni temporali da t=0 a t_end incluso
 
-    for t in t_samples:
+    for t in t_samples: # per ogni tempo, calcola le posizioni di tutti i droni
         positions = np.array([trajectories[did].position(t) for did in drone_ids])
         # Controlla tutte le coppie i<j
         for i in range(len(drone_ids)):
             for j in range(i + 1, len(drone_ids)):
-                dist = np.linalg.norm(positions[i] - positions[j])
+                dist = np.linalg.norm(positions[i] - positions[j]) # calcolo la distanza euclidea tra le posizioni
                 if dist < min_distance:
                     violations.append((drone_ids[i], drone_ids[j], float(t)))
 
@@ -84,7 +82,7 @@ def check_constraints_and_collisions(trajectories, drones, min_distance=0.5, dt=
     }
 
 
-def summarize_swarm_violations(violations):
+'''def summarize_swarm_violations(violations):
     """
     Riassume gli eventi di collisione:
       - droni coinvolti (offenders),
@@ -108,4 +106,4 @@ def summarize_swarm_violations(violations):
         "earliest_time": earliest_time,
         "pairs": pairs,
         "num_events": len(violations),
-    }
+    }'''
