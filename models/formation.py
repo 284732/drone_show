@@ -30,6 +30,7 @@ class Formation:
         """Numero di punti della formazione."""
         return self.target_positions.shape[0]   # ritorna il numero di punti (cioè (N)) -> ovvero quante pos target contiene la formazione
 
+
     def get_position(self, index):
         """Restituisce la posizione target i-esima."""
         return self.target_positions[index]     # ritorna la i-esima posizione target, una riga di 3 valori,

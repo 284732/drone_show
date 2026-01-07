@@ -26,7 +26,9 @@ def line_formation(num_points, length=1.0, axis='x'):
     else:
         raise ValueError("axis must be 'x', 'y' or 'z'")
 
-    return Formation(points)    # la classe Formation prende questi punti e li salva come formazione geometrica
+    #funzionava return Formation(points)    # la classe Formation prende questi punti e li salva come formazione geometrica
+    return Formation(target_positions=points)
+
 
 
 '''def circle_formation(num_points, radius=1.0):
@@ -106,7 +108,7 @@ def circle_formation_normal(num_points, radius=1.0, center=(0,0,0), normal=(0,0,
     points_rot = points_xy @ R.T
     points = points_rot + center
 
-    return Formation(points)
+    return Formation(target_positions=points)
 
 
 def transform_formation(formation, translation_vec=None, rotation_angle_z=None):
@@ -131,4 +133,4 @@ def transform_formation(formation, translation_vec=None, rotation_angle_z=None):
     if translation_vec is not None:
         points = translate(points, translation_vec)
 
-    return Formation(points, reference_time=formation.reference_time)
+    return Formation(target_positions=points, reference_time=formation.reference_time)

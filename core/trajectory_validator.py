@@ -27,7 +27,7 @@ def validate_trajectory(traj, drone, dt=0.01, eps=1e-9):
     return {
         "max_speed": float(max_speed),
         "max_acceleration": float(max_accel),
-        "valid_speed": bool(valid_speed),
+        "valid_speed": bool(valid_speed), #true se la velocità max calcolata lungo la traiettoria non supera il limite più il margine
         "valid_acceleration": bool(valid_acceleration),
     }
 

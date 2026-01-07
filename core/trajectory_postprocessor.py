@@ -33,7 +33,7 @@ def time_scale_trajectories(drones, assignment, duration, max_iterations=3, dt_c
                 global_scale = max(global_scale, scale_a)
 
         if global_scale > (1.0 + eps):
-            current_duration *= global_scale
+            current_duration *= global_scale + eps
         else:
             # tutti i droni rispettano i vincoli con la durata corrente
             return trajectories, current_duration
@@ -46,6 +46,41 @@ import numpy as np
 from core.trajectory_validator import validate_swarm_trajectories
 
 
+def resolve_collisions_with_start_delays_me(
+    trajectories, drones, *, min_distance=0.5, dt=0.05,
+    delay_step=5, max_iters=5, max_total_delay=8.0
+):
+    # Non azzerare: mantieni eventuali start_time esistenti
+    start_delays = {did: getattr(traj, "start_time", 0.0)
+                    for did, traj in trajectories.items()}
+
+    for it in range(max_iters):
+        violations = validate_swarm_trajectories(
+            trajectories, drones, min_distance=min_distance, dt=dt
+        )
+        if not violations:
+            return trajectories, {"status": "OK", "iterations": it, "start_delays": start_delays}
+
+        # collisione più precoce
+        did1, did2, t_collision = min(violations, key=lambda v: v[2])
+
+        # ritarda quello con meno delay accumulato
+        new_delay = start_delays[did2] + delay_step
+
+        # cap ai ritardi totali
+        if new_delay > max_total_delay:
+            return trajectories, {"status": "UNRESOLVED_COLLISION_MAX_DELAY",
+                                  "iterations": it+1, "start_delays": start_delays}
+
+        start_delays[did2] = new_delay
+        trajectories[did2].start_time = new_delay
+
+    return trajectories, {"status": "UNRESOLVED_COLLISION",
+                          "iterations": max_iters, "start_delays": start_delays}
+
+
+
+################################################
 ###OLD
 def resolve_collisions_with_start_delays(
     trajectories,
@@ -98,42 +133,6 @@ def resolve_collisions_with_start_delays(
         "start_delays": start_delays,
     }
 
-
-def resolve_collisions_with_start_delays_me(
-    trajectories, drones, *, min_distance=0.5, dt=0.05,
-    delay_step=5, max_iters=5, max_total_delay=8.0
-):
-    # Non azzerare: mantieni eventuali start_time esistenti
-    start_delays = {did: getattr(traj, "start_time", 0.0)
-                    for did, traj in trajectories.items()}
-
-    for it in range(max_iters):
-        violations = validate_swarm_trajectories(
-            trajectories, drones, min_distance=min_distance, dt=dt
-        )
-        if not violations:
-            return trajectories, {"status": "OK", "iterations": it, "start_delays": start_delays}
-
-        # collisione più precoce
-        did1, did2, t_collision = min(violations, key=lambda v: v[2])
-
-        # ritarda quello con meno delay accumulato
-        new_delay = start_delays[did2] + delay_step
-
-        # cap ai ritardi totali
-        if new_delay > max_total_delay:
-            return trajectories, {"status": "UNRESOLVED_COLLISION_MAX_DELAY",
-                                  "iterations": it+1, "start_delays": start_delays}
-
-        start_delays[did2] = new_delay
-        trajectories[did2].start_time = new_delay
-
-    return trajectories, {"status": "UNRESOLVED_COLLISION",
-                          "iterations": max_iters, "start_delays": start_delays}
-
-
-
-################################################
 # Applica ritardi per salita in cascata
 def apply_start_delays(trajectories, delay_step=0.5):
     """
