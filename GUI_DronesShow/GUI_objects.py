@@ -31,7 +31,7 @@ class CommandButton(tk.Button):
 
 class EntryFloat(tk.Entry):
     def __init__(self, root, textLabel, row, col):
-        # Registra la funzione di validazione SENZA parentesi
+        # Register the validation function WITHOUT parentheses
         vcmd = root.register(self.validate_float)
 
         super().__init__(root, width=10, validate='key',
@@ -45,18 +45,17 @@ class EntryFloat(tk.Entry):
         self.grid(row=row, column=col+1, padx=5, pady=15, sticky=tk.W)
 
     def validate_float(self, value):
-        """Funzione di validazione: riceve il nuovo valore come stringa."""
-        if value == "" or value == "-":  # consenti vuoto o segno meno temporaneo
+        """Function to validate: receives the new value as string."""
+        if value == "" or value == "-":  # Put temporary allow empty or minus sign
             return True
         try:
             float(value)
             return True
         except ValueError:
-            # Non mostrare subito errori (Tkinter chiama questa funzione ad ogni tasto)
             return False
 
     def get_float(self):
-        """Recupera il valore come float, con messaggio di errore se non valido."""
+        """Retake the value as float, with error message if not valid."""
         try:
             return float(self.get())
         except ValueError:
