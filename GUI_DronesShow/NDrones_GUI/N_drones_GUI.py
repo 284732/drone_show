@@ -26,21 +26,24 @@ class NDronesGUI(Toplevel):
                                        1, 200,
                                         0, 0)
 
+        self.button_frame = tk.Frame(self.config_frame)
+        self.button_frame.grid(row=1, column=0, sticky="nsew")
+
         """ Create the Confirm button. """
-        self.configuration_button = CommandButton(self.config_frame,
+        self.configuration_button = CommandButton(self.button_frame,
                                             'Configure',
                                             self.confirm_number_of_drones,
-                                            'grey',
-                                            'white',
-                                            1, 1)
+                                            'light grey',
+                                            'black',
+                                            0, 1)
 
         """ Confirm button. """
-        self.confirm_button = CommandButton(self.config_frame,
+        self.confirm_button = CommandButton(self.button_frame,
                                             'Confirm',
                                             self.confirm_configuration,
                                             'dark green',
                                             'white',
-                                            1, 0)
+                                            0, 0)
 
     def confirm_number_of_drones(self):
         self.n_ofDrones = int(self.nDrones_spinbox.get())

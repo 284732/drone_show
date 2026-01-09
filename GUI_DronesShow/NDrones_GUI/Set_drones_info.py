@@ -7,7 +7,10 @@ from tkinter import Toplevel
     - Initial position of the i-th drone (X, Y, Z).
     - Max velocity of the i-th drone.
     - Max acceleration of the i-th drone.
-    All the info are packed in a json file to be used for trajectory generation. 
+    All the info are packed in a json file to be used for trajectory generation.
+    
+    The initialPositionList function provides a list of default initial positions
+    for the drones, in case the user wants to use them.
 """
 
 global drone_config
@@ -31,7 +34,7 @@ def initialPositionList(n_drones):
 
 
 class DroneInfoGUI(Toplevel):
-    def __init__(self, parent, drone_id, default_x, default_y):
+    def __init__(self, parent, drone_id, default_X, default_Y):
         super().__init__(parent)  # Initialize the Tkinter root window
 
         self.drone_id = drone_id
@@ -48,12 +51,12 @@ class DroneInfoGUI(Toplevel):
         self.entry_x = EntryFloat(self.drone_i_frame,
                                   'Initial X position (m):',
                                   0, 0)
-        self.entry_x.insert(0, str(default_x))
+        self.entry_x.insert(0, str(default_X))
 
         self.entry_y = EntryFloat(self.drone_i_frame,
                                   'Initial Y position (m):',
                                   1, 0)
-        self.entry_y.insert(0, str(default_y))
+        self.entry_y.insert(0, str(default_Y))
 
         self.entry_z = EntryFloat(self.drone_i_frame,
                                   'Initial Z position (m):',
@@ -80,10 +83,10 @@ class DroneInfoGUI(Toplevel):
 
 
     def confirm_drone_parameters(self):
-        drone_config[f"drone {self.drone_id}"]['initial_position'] = [float(self.entry_x.get()),
-                                                                     float(self.entry_y.get()),
-                                                                     float(self.entry_z.get())]
-        drone_config[f"drone {self.drone_id}"]['max_velocity'] = float(self.entry_max_vel.get())
-        drone_config[f"drone {self.drone_id}"]['max_acceleration'] = float(self.entry_max_acc.get())
+        drone_config[f"drone {self.drone_id}"]['initial_position'] = [self.entry_x.get_float(),
+                                                                     self.entry_y.get_float(),
+                                                                     self.entry_z.get_float()]
+        drone_config[f"drone {self.drone_id}"]['max_velocity'] = self.entry_max_vel.get_float()
+        drone_config[f"drone {self.drone_id}"]['max_acceleration'] = self.entry_max_acc.get_float()
 
         self.destroy()
