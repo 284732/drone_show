@@ -27,7 +27,7 @@ if nDrones_window.get_check():
     for i in range(numberOfDrones):
         keyString = f"drone {i + 1}"
         drone_config[keyString] = {
-            "initial_position": [initialPosition[i][0], initialPosition[i][1], 2.0],
+            "initial_position": initialPosition[i],
             "max_velocity": 20.0,
             "max_acceleration": 20.0
         }
