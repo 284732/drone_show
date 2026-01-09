@@ -7,7 +7,7 @@ import time
 import coppeliasim_zmqremoteapi_client
 
 """ 
-    This file willl contain the main process of the Drone Show application. 
+    This file will contain the main process of the Drone Show application. 
 """
 
 mainRoot = tk.Tk()

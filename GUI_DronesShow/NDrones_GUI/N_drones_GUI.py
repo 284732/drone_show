@@ -1,8 +1,8 @@
-from GUI_objects import *
+from GUI_DronesShow.GUI_objects import *
 from tkinter import Toplevel
 
 """ 
-    In thiis file will be defined the drones configuration GUI.
+    In this file will be defined the drones configuration GUI.
     It will allow the user to select the number of drones and configure them.
     In case the user doesn't select any value, default values will be used. 
 """
