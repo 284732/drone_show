@@ -30,7 +30,7 @@ class NDronesGUI(Toplevel):
         self.configuration_button = CommandButton(self.config_frame,
                                             'Configure',
                                             self.confirm_number_of_drones,
-                                            'navy',
+                                            'grey',
                                             'white',
                                             1, 1)
 
