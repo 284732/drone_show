@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 """ 
-    In thhis file will be defined the classes objects to be reported
+    In this file will be defined the classes objects to be reported
     in the Drone Configuration GUI.
     gui_objects.py
 """
