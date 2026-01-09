@@ -1,10 +1,7 @@
 from NDrones_GUI.N_drones_GUI import NDronesGUI
 from NDrones_GUI.Set_drones_info import DroneInfoGUI, initialPositionList, drone_config
+from export_file.config_exporter_GUIof_drones import export_drones_config_to_yaml
 import tkinter as tk
-import json
-import os
-import time
-import coppeliasim_zmqremoteapi_client
 
 """ 
     This file will contain the main process of the Drone Show application. 
@@ -12,6 +9,8 @@ import coppeliasim_zmqremoteapi_client
 
 mainRoot = tk.Tk()
 mainRoot.withdraw()  # Hide the main root window
+icon = tk.PhotoImage(file="drone_32x32.png")
+mainRoot.iconphoto(True, icon)
 
 # Open the NDronesGUI to select the number of drones
 nDrones_window = NDronesGUI(mainRoot)
@@ -25,19 +24,18 @@ if nDrones_window.get_check():
     for i in range(numberOfDrones):
         keyString = f"drone {i + 1}"
         drone_config[keyString] = {
-            "initial_position": [initialPosition[i][0], initialPosition[i][1], 2.0],
+            "initial_position": initialPosition[i],
             "max_velocity": 20.0,
             "max_acceleration": 20.0
         }
-
 else:
     for i in range(numberOfDrones):
         drone_config_GUI = DroneInfoGUI(mainRoot, i + 1, initialPosition[i][0], initialPosition[i][1])
         mainRoot.wait_window(drone_config_GUI)  # Wait until the DroneInfoGUI window is closed
 
-print(drone_config)
 
 
+# ← AGGIUNGI QUESTA CHIAMATA ALLA FINE
+export_drones_config_to_yaml(drone_config, "config/drone_config.yaml")
 
-
-
+mainRoot.destroy()  # ← Opzionale: chiudi la finestra principale

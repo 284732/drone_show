@@ -48,7 +48,7 @@ from core.trajectory_validator import validate_swarm_trajectories
 
 def resolve_collisions_with_start_delays_me(
     trajectories, drones, *, min_distance=0.5, dt=0.05,
-    delay_step=5, max_iters=5, max_total_delay=8.0
+    delay_step=0.1, max_iters=20, max_total_delay=5.0
 ):
     # Non azzerare: mantieni eventuali start_time esistenti
     start_delays = {did: getattr(traj, "start_time", 0.0)

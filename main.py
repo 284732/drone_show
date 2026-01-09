@@ -297,24 +297,26 @@ plt.legend()
 plt.show()
 '''
 
+# main_show.py
 import yaml
 import numpy as np
-from models.drone import Drone
-from core.formation_generator import circle_formation_normal
-from core.trajectory_generator import generate_trajectories
-from core.assignment_solver import assign_drones_to_targets
-from core.trajectory_validator import check_constraints_and_collisions
-from core.trajectory_postprocessor import time_scale_trajectories, resolve_collisions_with_start_delays_me
 import matplotlib.pyplot as plt
 from matplotlib import animation
+from models.drone import Drone
+from models.show_sequencer import ShowSequencer
+
 
 ###############
-#   LETTURA YAML DRONI  #
+# CARICA DRONI DA GUI OFFLINE
 ###############
-with open("config/drone_config.yaml", "r") as f:
+
+
+###############
+# CARICA DRONI
+###############
+with open("GUI_DronesShow/config/drone_config.yaml", "r") as f:
     data = yaml.safe_load(f)
 
-# Creiamo oggetti Drone
 drones = []
 for drone_info in data["drones"]:
     drone = Drone(
@@ -325,91 +327,49 @@ for drone_info in data["drones"]:
     )
     drones.append(drone)
 
-num_drones = len(drones)  # numero di droni
-print("Droni istanziati:")
-for d in drones:
-    print(d)
+print(f"Droni caricati: {len(drones)}")
 
 ###############
-#   FORMAZIONE 1: cerchio grande
+# COSTRUISCI SHOW DALLA GUI CONFIG
 ###############
-formation1 = circle_formation_normal(
-    num_points=num_drones,
-    radius=3.0,
-    center=(0, 0, 0),
-    normal=(0, 0, 1)
-)
-
-assignment1 = assign_drones_to_targets(drones, formation1)
-trajectories1 = generate_trajectories(drones, assignment1, duration=5.0)
-trajectories1, duration1 = time_scale_trajectories(drones, assignment1, 5.0)
-trajectories1, _ = resolve_collisions_with_start_delays_me(trajectories1, drones)
+sequencer = ShowSequencer("config/show_config.yaml", drones)
+total_duration = sequencer.build_show()
 
 ###############
-#   FORMAZIONE 2: cerchio piccolo spostato
+# ANIMAZIONE
 ###############
-# Usare fine traiettoria 1 come inizio
-start_positions2 = {d.drone_id: trajectories1[d.drone_id].position(duration1) for d in drones}
-
-# Creiamo nuovi Drone temporanei per assegnazione
-drones_start2 = [Drone(d.drone_id, start_positions2[d.drone_id], d.max_velocity, d.max_acceleration) for d in drones]
-
-formation2 = circle_formation_normal(
-    num_points=num_drones,
-    radius=1.5,
-    center=(5, 0, 0),
-    normal=(0, 0, 1)
-)
-
-assignment2 = assign_drones_to_targets(drones_start2, formation2)
-trajectories2 = generate_trajectories(drones, assignment2, duration=5.0)
-trajectories2, duration2 = time_scale_trajectories(drones_start2, assignment2, 5.0)
-trajectories2, _ = resolve_collisions_with_start_delays_me(trajectories2, drones)
-
-###############
-#   FUNZIONE GLOBALE PER POSIZIONI
-###############
-def position_global(did, t):
-    if t <= duration1:
-        return trajectories1[did].position(t)
-    else:
-        return trajectories2[did].position(t - duration1)
-
-total_duration = duration1 + duration2
-
-###############
-#   VALIDAZIONE FINALE
-###############
-validation1 = check_constraints_and_collisions(trajectories1, drones)
-validation2 = check_constraints_and_collisions(trajectories2, drones)
-print("Validazione formazione 1:", validation1["dynamic_ok"], validation1["swarm_ok"])
-print("Validazione formazione 2:", validation2["dynamic_ok"], validation2["swarm_ok"])
-
-###############
-#   ANIMAZIONE LIVE
-###############
-fig = plt.figure(figsize=(10,8))
+fig = plt.figure(figsize=(12, 9))
 ax = fig.add_subplot(111, projection='3d')
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-ax.set_title("Animazione droni: due cerchi concatenati")
+ax.set_xlabel('X [m]')
+ax.set_ylabel('Y [m]')
+ax.set_zlabel('Z [m]')
 
-# Limiti assi (considera entrambe le formazioni)
-all_positions = np.vstack([formation1.target_positions, formation2.target_positions])
-xyz_min = all_positions.min(axis=0) - 1
-xyz_max = all_positions.max(axis=0) + 1
+# Calcola limiti da tutte le formazioni
+all_formations = sequencer.get_all_formations()
+all_positions = np.vstack(all_formations)
+margin = 2.0
+xyz_min = all_positions.min(axis=0) - margin
+xyz_max = all_positions.max(axis=0) + margin
 ax.set_xlim(xyz_min[0], xyz_max[0])
 ax.set_ylim(xyz_min[1], xyz_max[1])
 ax.set_zlim(xyz_min[2], xyz_max[2])
 
 # Punti droni
-points = [ax.plot([], [], [], 'o', label=f"Drone {d.drone_id}")[0] for d in drones]
+points = [ax.plot([], [], [], 'o', markersize=10)[0] for d in drones]
 
-# Frame e timestep
-fps = 20
+# Mostra tutti i target delle formazioni
+colors = ['red', 'green', 'blue', 'orange', 'purple', 'cyan', 'magenta', 'yellow']
+for i, formation_pos in enumerate(all_formations):
+    color = colors[i % len(colors)]
+    ax.scatter(formation_pos[:, 0], formation_pos[:, 1], formation_pos[:, 2],
+               color=color, s=50, alpha=0.3, marker='x',
+               label=f'Formazione {i + 1}')
+
+# Setup animazione
+fps = sequencer.get_fps()
 num_frames = int(total_duration * fps)
 times = np.linspace(0, total_duration, num_frames)
+
 
 def init():
     for p in points:
@@ -417,19 +377,22 @@ def init():
         p.set_3d_properties([])
     return points
 
+
 def animate(i):
     t = times[i]
     for idx, d in enumerate(drones):
-        pos = position_global(d.drone_id, t)
+        pos = sequencer.get_position(d.drone_id, t)
         points[idx].set_data([pos[0]], [pos[1]])
         points[idx].set_3d_properties([pos[2]])
+
+    # Mostra progresso
+    ax.set_title(f"Drone Show - {t:.1f}s / {total_duration:.1f}s", fontsize=14)
     return points
 
-ani = animation.FuncAnimation(fig, animate, frames=num_frames, init_func=init, blit=True)
 
-# Mostra i target di entrambe le formazioni
-ax.scatter(formation1.target_positions[:,0], formation1.target_positions[:,1], formation1.target_positions[:,2], color='red', s=50, label='Target 1')
-ax.scatter(formation2.target_positions[:,0], formation2.target_positions[:,1], formation2.target_positions[:,2], color='green', s=50, label='Target 2')
+ani = animation.FuncAnimation(fig, animate, frames=num_frames,
+                              init_func=init, blit=False, interval=1000 / fps)
 
-plt.legend()
+plt.legend(loc='upper right')
+plt.tight_layout()
 plt.show()
