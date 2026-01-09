@@ -29,7 +29,6 @@ if nDrones_window.get_check():
             "max_velocity": 20.0,
             "max_acceleration": 20.0
         }
-
 else:
     for i in range(numberOfDrones):
         drone_config_GUI = DroneInfoGUI(mainRoot, i + 1, initialPosition[i][0], initialPosition[i][1])
