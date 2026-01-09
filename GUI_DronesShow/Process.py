@@ -13,14 +13,14 @@ import coppeliasim_zmqremoteapi_client
 mainRoot = tk.Tk()
 mainRoot.withdraw()  # Hide the main root window
 
-    # Open the NDronesGUI to select the number of drones
+# Open the NDronesGUI to select the number of drones
 nDrones_window = NDronesGUI(mainRoot)
 mainRoot.wait_window(nDrones_window)  # Wait until the NDronesGUI window is closed
 numberOfDrones = nDrones_window.get_number_of_drones()
 
 initialPosition = initialPositionList(numberOfDrones)
 
-    # Open a DroneInfoGUI for each drone to configure its parameters
+# Open a DroneInfoGUI for each drone to configure its parameters
 for i in range(numberOfDrones):
     drone_config_GUI = DroneInfoGUI(mainRoot, i + 1, initialPosition[i][0], initialPosition[i][1])
     mainRoot.wait_window(drone_config_GUI)  # Wait until the DroneInfoGUI window is closed
