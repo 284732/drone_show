@@ -12,6 +12,8 @@ import coppeliasim_zmqremoteapi_client
 
 mainRoot = tk.Tk()
 mainRoot.withdraw()  # Hide the main root window
+icon = tk.PhotoImage(file="drone_32x32.png")
+mainRoot.iconphoto(True, icon)
 
 # Open the NDronesGUI to select the number of drones
 nDrones_window = NDronesGUI(mainRoot)
