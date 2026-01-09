@@ -34,7 +34,7 @@ def initialPositionList(n_drones):
 
 
 class DroneInfoGUI(Toplevel):
-    def __init__(self, parent, drone_id, default_x, default_y):
+    def __init__(self, parent, drone_id, default_X, default_Y):
         super().__init__(parent)  # Initialize the Tkinter root window
 
         self.drone_id = drone_id
@@ -51,12 +51,12 @@ class DroneInfoGUI(Toplevel):
         self.entry_x = EntryFloat(self.drone_i_frame,
                                   'Initial X position (m):',
                                   0, 0)
-        self.entry_x.insert(0, str(default_x))
+        self.entry_x.insert(0, str(default_X))
 
         self.entry_y = EntryFloat(self.drone_i_frame,
                                   'Initial Y position (m):',
                                   1, 0)
-        self.entry_y.insert(0, str(default_y))
+        self.entry_y.insert(0, str(default_Y))
 
         self.entry_z = EntryFloat(self.drone_i_frame,
                                   'Initial Z position (m):',
