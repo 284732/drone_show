@@ -83,10 +83,10 @@ class DroneInfoGUI(Toplevel):
 
 
     def confirm_drone_parameters(self):
-        drone_config[f"drone {self.drone_id}"]['initial_position'] = [float(self.entry_x.get()),
-                                                                     float(self.entry_y.get()),
-                                                                     float(self.entry_z.get())]
-        drone_config[f"drone {self.drone_id}"]['max_velocity'] = float(self.entry_max_vel.get())
-        drone_config[f"drone {self.drone_id}"]['max_acceleration'] = float(self.entry_max_acc.get())
+        drone_config[f"drone {self.drone_id}"]['initial_position'] = [self.entry_x.get_float(),
+                                                                     self.entry_y.get_float(),
+                                                                     self.entry_z.get_float()]
+        drone_config[f"drone {self.drone_id}"]['max_velocity'] = self.entry_max_vel.get_float()
+        drone_config[f"drone {self.drone_id}"]['max_acceleration'] = self.entry_max_acc.get_float()
 
         self.destroy()
