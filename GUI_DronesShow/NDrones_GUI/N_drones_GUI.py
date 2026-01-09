@@ -18,6 +18,7 @@ class NDronesGUI(Toplevel):
         self.config_frame = tk.Frame(self)
         self.config_frame.grid(row=0, column=0, sticky="nsew")
         self.n_ofDrones = 0
+        self.check = False
 
         """ Create the Spinbox for selecting number of drones. """
         self.nDrones_spinbox = SpinBox(self.config_frame,
@@ -26,10 +27,18 @@ class NDronesGUI(Toplevel):
                                         0, 0)
 
         """ Create the Confirm button. """
+        self.configuration_button = CommandButton(self.config_frame,
+                                            'Configure',
+                                            self.confirm_number_of_drones,
+                                            'navy',
+                                            'white',
+                                            1, 1)
+
+        """ Confirm button. """
         self.confirm_button = CommandButton(self.config_frame,
                                             'Confirm',
-                                            self.confirm_number_of_drones,
-                                            'blue',
+                                            self.confirm_configuration,
+                                            'dark green',
                                             'white',
                                             1, 0)
 
@@ -37,5 +46,13 @@ class NDronesGUI(Toplevel):
         self.n_ofDrones = int(self.nDrones_spinbox.get())
         self.destroy()
 
+    def confirm_configuration(self):
+        self.n_ofDrones = int(self.nDrones_spinbox.get())
+        self.check = True
+        self.destroy()
+
     def get_number_of_drones(self):
         return self.n_ofDrones
+
+    def get_check(self):
+        return self.check

@@ -20,10 +20,20 @@ numberOfDrones = nDrones_window.get_number_of_drones()
 
 initialPosition = initialPositionList(numberOfDrones)
 
-# Open a DroneInfoGUI for each drone to configure its parameters
-for i in range(numberOfDrones):
-    drone_config_GUI = DroneInfoGUI(mainRoot, i + 1, initialPosition[i][0], initialPosition[i][1])
-    mainRoot.wait_window(drone_config_GUI)  # Wait until the DroneInfoGUI window is closed
+if nDrones_window.get_check():
+    # Impose the default configuration and confirm
+    for i in range(numberOfDrones):
+        keyString = f"drone {i + 1}"
+        drone_config[keyString] = {
+            "initial_position": [initialPosition[i][0], initialPosition[i][1], 2.0],
+            "max_velocity": 20.0,
+            "max_acceleration": 20.0
+        }
+
+else:
+    for i in range(numberOfDrones):
+        drone_config_GUI = DroneInfoGUI(mainRoot, i + 1, initialPosition[i][0], initialPosition[i][1])
+        mainRoot.wait_window(drone_config_GUI)  # Wait until the DroneInfoGUI window is closed
 
 print(drone_config)
 
