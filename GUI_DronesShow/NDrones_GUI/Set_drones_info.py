@@ -7,7 +7,10 @@ from tkinter import Toplevel
     - Initial position of the i-th drone (X, Y, Z).
     - Max velocity of the i-th drone.
     - Max acceleration of the i-th drone.
-    All the info are packed in a json file to be used for trajectory generation. 
+    All the info are packed in a json file to be used for trajectory generation.
+    
+    The initialPositionList function provides a list of default initial positions
+    for the drones, in case the user wants to use them.
 """
 
 global drone_config
