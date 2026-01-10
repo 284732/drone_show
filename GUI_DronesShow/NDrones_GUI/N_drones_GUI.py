@@ -1,4 +1,4 @@
-from GUI_DronesShow.GUI_objects import *
+from GUI_DronesShow.droneShow_GUI_obj.GUI_objects import *
 from tkinter import Toplevel
 
 """ 
