@@ -2,7 +2,7 @@ from GUI_DronesShow.GUI_objects import *
 from tkinter import Toplevel
 
 """ 
-    In this file will be deffined the drones configuration GUI.
+    In this file will be defined the drones configuration GUI.
     The user can insert:
     - Initial position of the i-th drone (X, Y, Z).
     - Max velocity of the i-th drone.

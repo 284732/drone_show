@@ -3,7 +3,7 @@ import yaml
 import numpy as np
 from typing import List, Dict
 from models.drone import Drone
-from core.formation_generator import circle_formation_normal
+from core.formation_generator import circle_formation_normal, sphere_formation, spiral_formation, star_formation, line_formation, heart_formation, number_formation, helix_formation, pyramid_formation, cube_formation, grid_formation, wave_formation
 from core.trajectory_generator import generate_trajectories
 from core.assignment_solver import assign_drones_to_targets
 from core.trajectory_validator import check_constraints_and_collisions
@@ -27,9 +27,17 @@ class ShowSequencer:
         # Mappa tipo formazione -> funzione generatrice
         self.formation_generators = {
             'circle': self._generate_circle,
-            # 'sphere': self._generate_sphere,
-            # 'line': self._generate_line,
-            # ... aggiungi altre formazioni
+            'line': self._generate_line,
+            'sphere': self._generate_sphere,
+            'helix': self._generate_helix,
+            'cube': self._generate_cube,
+            'grid': self._generate_grid,
+            'heart': self._generate_heart,
+            'star': self._generate_star,
+            'wave': self._generate_wave,
+            'pyramid': self._generate_pyramid,
+            'spiral': self._generate_spiral,
+            'number': self._generate_number,
         }
 
     def _generate_circle(self, params: Dict) -> np.ndarray:
@@ -40,6 +48,99 @@ class ShowSequencer:
             center=tuple(params['center']),
             normal=tuple(params['normal'])
         )
+
+    def _generate_line(self, params):
+        return line_formation(
+            num_points=len(self.drones),
+            length=params['length'],
+            axis=params['axis']
+        )
+
+    def _generate_sphere(self, params):
+        return sphere_formation(
+            num_points=len(self.drones),
+            radius=params['radius'],
+            center=tuple(params['center'])
+        )
+
+    def _generate_helix(self, params):
+        return helix_formation(
+            num_points=len(self.drones),
+            radius=params['radius'],
+            height=params['height'],
+            turns=params['turns'],
+            center=tuple(params['center'])
+        )
+
+    def _generate_cube(self, params):
+        return cube_formation(
+            num_points=len(self.drones),
+            side_length=params['side_length'],
+            center=tuple(params['center'])
+        )
+
+    def _generate_grid(self, params):
+        return grid_formation(
+            num_points=len(self.drones),
+            spacing=params['spacing'],
+            center=tuple(params['center']),
+            plane=params['plane']
+        )
+
+    def _generate_heart(self, params):
+        return heart_formation(
+            num_points=len(self.drones),
+            size=params['size'],
+            center=tuple(params['center']),
+            plane=params['plane']
+        )
+
+    def _generate_star(self, params):
+        return star_formation(
+            num_points=len(self.drones),
+            outer_radius=params['outer_radius'],
+            inner_radius=params['inner_radius'],
+            num_spikes=params['num_spikes'],
+            center=tuple(params['center']),
+            plane=params['plane']
+        )
+
+    def _generate_wave(self, params):
+        return wave_formation(
+            num_points=len(self.drones),
+            wavelength=params['wavelength'],
+            amplitude=params['amplitude'],
+            length=params['length'],
+            center=tuple(params['center']),
+        )
+
+    def _generate_pyramid(self, params):
+        return pyramid_formation(
+            num_points=len(self.drones),
+            base_size=params['base_size'],
+            height=params['height'],
+            center=tuple(params['center'])
+        )
+
+    def _generate_spiral(self, params):
+        return spiral_formation(
+            num_points=len(self.drones),
+            radius_start=params['radius_start'],
+            radius_end=params['radius_end'],
+            height=params['height'],
+            turns=params['turns'],
+            center=tuple(params['center'])
+        )
+
+    def _generate_number(self, params):
+        return number_formation(
+            num_points=len(self.drones),
+            digit=params['number'],
+            size=params['size'],
+            center=tuple(params['center']),
+            plane=params['plane']
+        )
+
 
     # Aggiungi qui altri metodi _generate_xxx per altre formazioni
 
