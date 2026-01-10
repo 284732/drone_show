@@ -3,7 +3,7 @@ from NDrones_GUI.Set_drones_info import DroneInfoGUI, initialPositionList, drone
 from ShowSequence_GUI.numberOfSteps_GUI import numberOfStepsGUI
 from ShowSequence_GUI.ShapeChoice_GUI import ShapeSelectionGUI
 from ShowSequence_GUI.ConfigurationShape_GUI import ConfigurationShapeGUI
-from utils import close_all
+from utils import close_all, toYAML
 import tkinter as tk
 import coppeliasim_zmqremoteapi_client
 
@@ -57,6 +57,8 @@ for step_i in range(numberOfSteps):
 
 shape_dict = shapeConfig_window.get_shape_dict() # Get the final shape_dict from the last shapeConfig_window
 print(shape_dict)
+
+toYAML(shape_dict)
 
 
 
