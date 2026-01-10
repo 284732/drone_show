@@ -56,8 +56,7 @@ for step_i in range(numberOfSteps):
     mainRoot.wait_window(shapeConfig_window)  # Wait until the ConfigurationShapeGUI window is closed
 
 shape_dict = shapeConfig_window.get_shape_dict() # Get the final shape_dict from the last shapeConfig_window
-print(shape_dict)
-
+# Convert the shape_dict to a YAML file
 toYAML(shape_dict)
 
 
