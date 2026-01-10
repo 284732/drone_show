@@ -1,4 +1,5 @@
 from GUI_DronesShow.droneShow_GUI_obj.GUI_objects import *
+from GUI_DronesShow.utils import close_all
 from tkinter import Toplevel
 
 """ 
@@ -14,6 +15,7 @@ class NDronesGUI(Toplevel):
         self.title("Drone Show")
         self.geometry("300x100")
         self.resizable(False, False)
+        self.protocol("WM_DELETE_WINDOW", close_all)
 
         self.config_frame = tk.Frame(self)
         self.config_frame.grid(row=0, column=0, sticky="nsew")

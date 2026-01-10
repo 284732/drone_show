@@ -30,13 +30,13 @@ class numberOfStepsGUI(Toplevel):
         """ Create the Confirm button. """
         self.confirm_button = CommandButton(self.button_frame,
                                             'Confirm',
-                                            self.confirm_defaultShape,
+                                            self.confirm_shape,
                                             'dark green',
                                             'white',
                                             1, 0)
 
 
-    def confirm_defaultShape(self):
+    def confirm_shape(self):
         self.n_ofSteps = int(self.nSteps_spinbox.get())
         self.destroy()
 

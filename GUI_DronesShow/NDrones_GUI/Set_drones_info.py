@@ -1,4 +1,5 @@
 from GUI_DronesShow.droneShow_GUI_obj.GUI_objects import *
+from GUI_DronesShow.utils import close_all
 from tkinter import Toplevel
 
 """ 
@@ -41,6 +42,7 @@ class DroneInfoGUI(Toplevel):
         self.title(f"Drone {self.drone_id} Configuration")
         self.geometry("300x400")
         self.resizable(False, False)
+        self.protocol("WM_DELETE_WINDOW", close_all)
         keyString = f"drone {self.drone_id}"
         drone_config[keyString] = {}
 
