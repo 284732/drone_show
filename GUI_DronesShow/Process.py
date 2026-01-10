@@ -1,15 +1,15 @@
-from NDrones_GUI.N_drones_GUI import NDronesGUI
-from NDrones_GUI.Set_drones_info import DroneInfoGUI, initialPositionList, drone_config
+from GUI_DronesShow.NDrones_GUI.N_drones_GUI import NDronesGUI
+from GUI_DronesShow.NDrones_GUI.Set_drones_info import DroneInfoGUI, initialPositionList, drone_config
 from export_file.config_exporter_GUIof_drones import export_drones_config_to_yaml
 import tkinter as tk
 
 """ 
     This file will contain the main process of the Drone Show application. 
 """
-
+icon_path = "GUI_DronesShow/drone_32x32.png"
 mainRoot = tk.Tk()
 mainRoot.withdraw()  # Hide the main root window
-icon = tk.PhotoImage(file="drone_32x32.png")
+icon = tk.PhotoImage(file=icon_path)
 mainRoot.iconphoto(True, icon)
 
 # Open the NDronesGUI to select the number of drones
@@ -33,9 +33,7 @@ else:
         drone_config_GUI = DroneInfoGUI(mainRoot, i + 1, initialPosition[i][0], initialPosition[i][1])
         mainRoot.wait_window(drone_config_GUI)  # Wait until the DroneInfoGUI window is closed
 
-
-
-# ← AGGIUNGI QUESTA CHIAMATA ALLA FINE
+# Esporta nella cartella config/ principale
 export_drones_config_to_yaml(drone_config, "config/drone_config.yaml")
 
-mainRoot.destroy()  # ← Opzionale: chiudi la finestra principale
+mainRoot.destroy()

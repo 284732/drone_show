@@ -297,24 +297,30 @@ plt.legend()
 plt.show()
 '''
 
-# main_show.py
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from models.drone import Drone
 from models.show_sequencer import ShowSequencer
+import subprocess
+import sys
+import os
 
 
-###############
-# CARICA DRONI DA GUI OFFLINE
-###############
-
+# Importa direttamente la GUI - questo la esegue automaticamente
+from GUI_DronesShow.Process import mainRoot
 
 ###############
-# CARICA DRONI
+# CARICA DRONI DAL FILE GENERATO DALLA GUI
 ###############
-with open("GUI_DronesShow/config/drone_config.yaml", "r") as f:
+config_path = "config/drone_config.yaml"  # ← Path corretto
+
+# Verifica che il file esista
+if not os.path.exists(config_path):
+    raise FileNotFoundError(f"❌ File {config_path} non trovato! La GUI dovrebbe averlo creato.")
+
+with open(config_path, "r") as f:  # ← Path corretto
     data = yaml.safe_load(f)
 
 drones = []
