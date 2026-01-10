@@ -1,5 +1,6 @@
 from NDrones_GUI.N_drones_GUI import NDronesGUI
 from NDrones_GUI.Set_drones_info import DroneInfoGUI, initialPositionList, drone_config
+from ShowSequence_GUI.numberOfSteps_GUI import numberOfStepsGUI
 import tkinter as tk
 import json
 import os
@@ -36,7 +37,11 @@ else:
         drone_config_GUI = DroneInfoGUI(mainRoot, i + 1, initialPosition[i][0], initialPosition[i][1])
         mainRoot.wait_window(drone_config_GUI)  # Wait until the DroneInfoGUI window is closed
 
-print(drone_config)
+
+""" Starts the show sequence configuration. """
+showSequence_window = numberOfStepsGUI(mainRoot)
+mainRoot.wait_window(showSequence_window)  # Wait until the numberOfStepsGUI window is closed
+numberOfSteps = showSequence_window.get_n_ofSteps()
 
 
 

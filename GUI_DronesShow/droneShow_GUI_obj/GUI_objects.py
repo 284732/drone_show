@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 
 """ 
     In this file will be defined the classes objects to be reported
@@ -26,6 +26,18 @@ class CommandButton(tk.Button):
         self.col = col
 
         self.grid(row=self.row, column=self.col, padx=10, pady=10, sticky=tk.W)
+
+
+class ComboBox(tk.ttk.Combobox):
+    def __init__(self, root, textLabel, valuesList, row, col):
+        super().__init__(root, values=valuesList, state='readonly', width=12)
+
+        # LABELING THE COMBOBOX
+        self.combobox_label = tk.Label(root, text=textLabel)
+        self.combobox_label.grid(row=row, column=col, padx=5, pady=15, sticky=tk.W)
+
+        # PLACING THE COMBOBOX
+        self.grid(row=row, column=col+1, padx=5, pady=15, sticky=tk.W)
 
 
 
