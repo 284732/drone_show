@@ -257,3 +257,23 @@ class ShowSequencer:
     def get_fps(self) -> int:
         """Ritorna gli FPS configurati"""
         return self.config.get('fps', 20)
+
+    def get_velocity(self, drone_id: int, t: float) -> np.ndarray:
+        """Ritorna la velocità di un drone al tempo t globale"""
+        for i, seq in enumerate(self.sequences):
+            t_start = self.cumulative_times[i]
+            t_end = self.cumulative_times[i + 1]
+
+            if t_start <= t < t_end:
+                local_t = t - t_start
+                transition_dur = seq['transition_duration']
+
+                # Fase di transizione: drone in movimento
+                if local_t <= transition_dur:
+                    return seq['trajectories'][drone_id].velocity(local_t)
+                # Fase di hold: velocità nulla
+                else:
+                    return np.zeros(3)
+
+        # Se siamo oltre la fine: fermo
+        return np.zeros(3)
